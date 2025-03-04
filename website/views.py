@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm
+from .models import Record
 
 # Create your views here.
 def home(request):
+    records = Record.objects.all()
+
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -19,7 +23,8 @@ def home(request):
             messages.error(request, 'Invalid username or password')
             return redirect('home')
     else:
-        return render(request, 'home.html', {})
+        return render(request, 'home.html', {'records': records})
+
 
 def login_user(request):
     pass
@@ -45,3 +50,11 @@ def register_user(request):
         return render(request, 'register.html', {'form': form})
     
     return render(request, 'register.html', {'form': form})
+
+def customer(request, pk):
+    if request.user.is_authenticated:
+        record = Record.objects.get(id=pk)
+        return render(request, 'record.html', {'record': record})
+    else:
+        messages.error(request, 'You must be logged in to view that page')
+        return redirect('home')
