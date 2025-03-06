@@ -53,8 +53,12 @@ def register_user(request):
 
 def customer(request, pk):
     if request.user.is_authenticated:
-        record = Record.objects.get(id=pk)
-        return render(request, 'record.html', {'record': record})
+        record = Record.objects.filter(id=pk).first()
+        if record:
+            return render(request, 'record.html', {'record': record})
+        else:
+            messages.error(request, 'Record does not exist')
+            return redirect('home')
     else:
         messages.error(request, 'You must be logged in to view that page')
         return redirect('home')
