@@ -89,3 +89,18 @@ def add_record(request):
         messages.error(request, 'You must be logged in to do that')
         return render(request, 'home')
     
+def update_record(request, pk):
+    if request.user.is_authenticated:
+        record = Record.objects.filter(id=pk).first()
+        form = RecordForm(request.POST or None, instance=record)
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Record updated')
+                return redirect('home')
+        else:
+            return render(request, 'update_record', {'form': form})
+    else:
+        messages.error(request, 'You must be logged in to do that')
+        return redirect('home')
+    
